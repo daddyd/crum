@@ -41,13 +41,21 @@ add_media() {
 }
 
 remove_media() {
-        MEDIANAME="${1}"
-        sed -i /"${MEDIANAME}"/d "${CRUMDB}"
+        if [[ -w "${CRUMDB}" ]]; then
+                MEDIANAME="${1}"
+                sed -i /"${MEDIANAME}"/d "${CRUMDB}"
+        else
+                echo "No catalog or catalog write protected"
+        fi
 }
 
 find_file() {
-        FILE="${1}"
-        grep "${FILE}" "${CRUMDB}" | cut -d, -f1
+        if [[ -r "${CRUMDB}" ]]; then
+                FILE="${1}"
+                grep "${FILE}" "${CRUMDB}" | cut -d, -f1
+        else
+                echo "No catalog or catalog unreadable"
+        fi
 }
 
 check_crumdbdir || exit 1
