@@ -29,14 +29,20 @@ helpmsg() {
 }
 
 add_media() {
-        MOUNTPOINT="${1}"
-        if [[ -d "${MOUNTPOINT}" ]]; then
-                MEDIANAME=$(basename "${MOUNTPOINT}")
-                find "${MOUNTPOINT}" |
-                while IFS= read -r FOUND;
-                do
-                        echo "${MEDIANAME},${FOUND}" >> "${CRUMDB}"
-                done
+        if [[ -w "${CRUMDB}" ]]; then
+                MOUNTPOINT="${1}"
+                if [[ -d "${MOUNTPOINT}" ]]; then
+                        MEDIANAME=$(basename "${MOUNTPOINT}")
+                        find "${MOUNTPOINT}" |
+                        while IFS= read -r FOUND;
+                        do
+                                echo "${MEDIANAME},${FOUND}" >> "${CRUMDB}"
+                        done
+                else
+                        echo "Error: Media ${MOUNTPOINT} not available"
+                fi
+        else
+                echo 'Error: No catalog or catalog write protected'
         fi
 }
 
@@ -45,7 +51,7 @@ remove_media() {
                 MEDIANAME="${1}"
                 sed -i /"${MEDIANAME}"/d "${CRUMDB}"
         else
-                echo "No catalog or catalog write protected"
+                echo 'Error: No catalog or catalog write protected'
         fi
 }
 
@@ -54,7 +60,7 @@ find_file() {
                 FILE="${1}"
                 grep "${FILE}" "${CRUMDB}" | cut -d, -f1
         else
-                echo "No catalog or catalog unreadable"
+                echo 'Error: No catalog or catalog unreadable'
         fi
 }
 
